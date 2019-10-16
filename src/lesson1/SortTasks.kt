@@ -84,7 +84,7 @@ fun sortAddresses(inputName: String, outputName: String) {
                 throw IllegalArgumentException()
             }
         }
-        for (elem in citizens.keys.sortedBy{ it.second }.sortedBy { it.first }) {
+        for (elem in citizens.keys.sortedBy { it.second }.sortedBy { it.first }) {
             it.write("${elem.first} ${elem.second}")
             it.write(" - ")
             it.write(citizens[elem]!!.sorted().toString().drop(1).dropLast(1))
@@ -184,8 +184,6 @@ fun sortTemperatures(inputName: String, outputName: String) {
 */
 
 
-
-
 /**
  * Сортировка последовательности
  *
@@ -205,7 +203,8 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * Необходимо найти число, которое встречается в этой последовательности наибольшее количество раз,
  * а если таких чисел несколько, то найти минимальное из них,
  * и после этого переместить все такие числа в конец заданной последовательности.
- * Порядок расположения остальных чисел должен остаться без изменения.
+ *
+ * ПОРЯДОК РАСПОЛОЖЕНИЯ ОСТАЛЬНЫХ ЧИСЕЛ ДОЛЖЕН ОСТАТЬСЯ БЕЗ ИЗМЕНЕНИЯ.
  *
  * 1
  * 3
@@ -216,7 +215,36 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  */
 
-/** Время исполнения = O(n^2) **/
+/** Время исполнения ~ O(n) **/
+
+fun sortSequence(inputName: String, outputName: String) {
+    File(outputName).bufferedWriter().use {
+        val repeats = mutableListOf<Int>()
+        var maxRepeats = 0
+        try {
+            for (line in File(inputName).readLines()) {
+                val value = line.toInt()
+                repeats[value] += 1
+                if (repeats[value] > maxRepeats) maxRepeats = repeats[value]
+            }
+        } catch (e: NumberFormatException) {
+            throw IllegalArgumentException()
+        }
+        val minOften = repeats.indexOf(maxRepeats).toString()
+
+        for (line in File(inputName).readLines()) {
+            if (line != minOften) {
+                it.write(line)
+                it.newLine()
+            }
+        }
+        for (i in 1..maxRepeats) {
+            it.write(minOften)
+            it.newLine()
+        }
+    }
+}
+/*
 fun sortSequence(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         // values: [ value, number of repeats ]
@@ -263,6 +291,7 @@ fun sortSequence(inputName: String, outputName: String) {
         }
     }
 }
+*/
 
 /*
 fun sortSequence(inputName: String, outputName: String) {
