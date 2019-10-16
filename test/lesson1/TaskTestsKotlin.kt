@@ -5,6 +5,12 @@ import kotlin.test.Test
 
 class TaskTestsKotlin : AbstractTaskTests() {
 
+    private fun assertFileContent(name: String, expectedContent: String) {
+        val file = File(name)
+        val content = file.readLines().joinToString("\n")
+        assertEquals(expectedContent, content)
+    }
+
     @Test
     @Tag("Easy")
     fun testSortTimes() {

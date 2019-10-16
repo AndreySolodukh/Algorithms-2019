@@ -62,8 +62,33 @@ fun sortTimes(inputName: String, outputName: String) {
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+
+// O(n*log(n)) - ???
 fun sortAddresses(inputName: String, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        val citizens: MutableMap<Pair<String, Int>, List<String>> = mutableMapOf()
+        for (line in File(inputName).readLines()) {
+            try {
+                val roomer = line.split(" - ")[0]
+                val house = line.split(" - ")[1].split(" ")[0]
+                // Проверка на "лишние" элементы после полной записи формата "фамилия имя - дом номер"
+                if (line.split(" ").size != 5) {
+                    throw IllegalArgumentException()
+                }
+                // Проверка формата номера дома
+                val number = line.split(" - ")[1].split(" ")[1].toInt()
+                citizens[Pair(house, number)] = (citizens[Pair(house, number)] ?: listOf()) + roomer
+            } catch (e: NumberFormatException) {
+                throw IllegalArgumentException()
+            }
+        }
+        for (elem in citizens.keys.sortedBy{ it.second }.sortedBy { it.first }) {
+            it.write("${elem.first} ${elem.second}")
+            it.write(" - ")
+            it.write(citizens[elem]!!.sorted().toString().drop(1).dropLast(1))
+            it.newLine()
+        }
+    }
 }
 
 /**
@@ -96,8 +121,33 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 99.5
  * 121.3
  */
+
+/** Время исполнения = O(n^2) **/
 fun sortTemperatures(inputName: String, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        val temperatures: MutableList<Float> = mutableListOf()
+        try {
+            for (line in File(inputName).readLines()) {
+                val value = line.toFloat()
+                when {
+                    temperatures.isEmpty() || (value >= temperatures.last()) -> temperatures.add(value)
+                    value <= temperatures.first() -> temperatures.add(0, value)
+                    else ->
+                        for (i in 0 until temperatures.size)
+                            if ((value >= temperatures[i]) && (value <= temperatures[i + 1])) {
+                                temperatures.add(i + 1, value)
+                                break
+                            }
+                }
+            }
+        } catch (e: NumberFormatException) {
+            throw IllegalArgumentException()
+        }
+        for (elem in temperatures) {
+            it.write(elem.toString())
+            it.newLine()
+        }
+    }
 }
 
 /**
@@ -129,9 +179,85 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  * 2
  */
+
+/** Время исполнения = O(n^2) **/
 fun sortSequence(inputName: String, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        // values: [ value, number of repeats ]
+        val values: MutableList<Pair<Int, Int>> = mutableListOf()
+        var max = 0
+        try {
+            for (line in File(inputName).readLines()) {
+                val value = line.toInt()
+                when {
+                    values.isEmpty() || (value > values.last().first) -> {
+                        values.add(Pair(value, 1))
+                        if (max < 1) max = 1
+                    }
+                    value < values.first().first -> values.add(0, Pair(value, 1))
+                    else ->
+                        for (i in 0 until values.size) {
+                            // Изменять элементы пары нельзя => заменяем пару целиком
+                            if (value == values[i].first) {
+                                values[i] = Pair(values[i].first, values[i].second + 1)
+                                if (max < values[i].second) max = values[i].second
+                            }
+                            if ((value > values[i].first) && (value < values[i + 1].first)) {
+                                values.add(i + 1, Pair(value, 1))
+                                break
+                            }
+                        }
+                }
+            }
+        } catch (e: NumberFormatException) {
+            throw IllegalArgumentException()
+        }
+        var oftenMin: Int? = null
+        for ((value, repeats) in values) {
+            if (repeats != max || oftenMin != null) {
+                for (i in 1..repeats) {
+                    it.write(value.toString())
+                    it.newLine()
+                }
+            } else oftenMin = value
+        }
+        for (i in 1..max) {
+            it.write(oftenMin.toString())
+            it.newLine()
+        }
+    }
 }
+
+/*
+fun sortSequence(inputName: String, outputName: String) {
+    File(outputName).bufferedWriter().use {
+        var max = 0
+        val numbers: MutableMap<Int, Int> = mutableMapOf()
+        for (line in File(inputName).readLines()) {
+            try {
+                val number = line.toInt()
+                numbers[number] = (numbers[number] ?: 0) + 1
+                if (numbers[number]!! > max) max = numbers[number]!!
+            } catch (e: NumberFormatException) {
+                throw IllegalArgumentException()
+            }
+        }
+        //max = numbers.keys.sorted().first { numbers[it] == max }
+        max = numbers.keys.filter { numbers[it] == max }.sorted().first()
+        for ((key, value) in numbers.toSortedMap()) {
+            if (key != max)
+                for (i in 1..value) {
+                    it.write(key.toString())
+                    it.newLine()
+                }
+        }
+        for (i in 1..numbers[max]!!) {
+            it.write(max.toString())
+            it.newLine()
+        }
+    }
+}
+*/
 
 /**
  * Соединить два отсортированных массива в один
@@ -147,7 +273,13 @@ fun sortSequence(inputName: String, outputName: String) {
  *
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
  */
+
+/** Время исполнения - O(n*log(n)) **/
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    TODO()
+    for (i in 0 until first.size) {
+        second[i] = first[i]
+    }
+    second.sort()
 }
+
 
