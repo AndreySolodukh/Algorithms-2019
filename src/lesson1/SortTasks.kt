@@ -128,27 +128,19 @@ fun sortAddresses(inputName: String, outputName: String) {
 fun sortTemperatures(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         val temperatures: MutableMap<Float, Int> = mutableMapOf()
-        var max = 0
         try {
             for (line in File(inputName).readLines()) {
                 val value = line.toFloat()
                 temperatures[value] = (temperatures[value] ?: 0) + 1
-                if (temperatures[value]!! > max) max = temperatures[value]!!
             }
         } catch (e: NumberFormatException) {
             throw IllegalArgumentException()
         }
-        var minOften: Float? = null
         for ((value, repeats) in temperatures.toSortedMap()) {
-            if (repeats != max || minOften != null)
-                for (i in 1..repeats) {
-                    it.write(value.toString())
-                    it.newLine()
-                } else minOften = value
-        }
-        for (i in 1..max) {
-            it.write(minOften.toString())
-            it.newLine()
+            for (i in 1..repeats) {
+                it.write(value.toString())
+                it.newLine()
+            }
         }
     }
 }
@@ -219,27 +211,34 @@ fun sortTemperatures(inputName: String, outputName: String) {
 
 fun sortSequence(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
-        val repeats = mutableListOf<Int>()
+        val repeats = mutableMapOf<Int, Int>()
         var maxRepeats = 0
+        var minOften: Int? = null
         try {
             for (line in File(inputName).readLines()) {
                 val value = line.toInt()
-                repeats[value] += 1
-                if (repeats[value] > maxRepeats) maxRepeats = repeats[value]
+                repeats[value] = (repeats[value] ?: 0) + 1
+                if ((minOften == null) ||
+                    (repeats[value]!! > maxRepeats) ||
+                    (repeats[value]!! == maxRepeats && value < minOften)
+                ) {
+                    maxRepeats = repeats[value]!!
+                    minOften = value
+                }
             }
         } catch (e: NumberFormatException) {
             throw IllegalArgumentException()
         }
-        val minOften = repeats.indexOf(maxRepeats).toString()
+
 
         for (line in File(inputName).readLines()) {
-            if (line != minOften) {
+            if (line != minOften.toString()) {
                 it.write(line)
                 it.newLine()
             }
         }
         for (i in 1..maxRepeats) {
-            it.write(minOften)
+            it.write(minOften.toString())
             it.newLine()
         }
     }
