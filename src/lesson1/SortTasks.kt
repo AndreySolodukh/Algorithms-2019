@@ -124,7 +124,37 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 
+/** Время реализации >= O(n*log(n)) **/
+fun sortTemperatures(inputName: String, outputName: String) {
+    File(outputName).bufferedWriter().use {
+        val temperatures: MutableMap<Float, Int> = mutableMapOf()
+        var max = 0
+        try {
+            for (line in File(inputName).readLines()) {
+                val value = line.toFloat()
+                temperatures[value] = (temperatures[value] ?: 0) + 1
+                if (temperatures[value]!! > max) max = temperatures[value]!!
+            }
+        } catch (e: NumberFormatException) {
+            throw IllegalArgumentException()
+        }
+        var minOften: Float? = null
+        for ((value, repeats) in temperatures.toSortedMap()) {
+            if (repeats != max || minOften != null)
+                for (i in 1..repeats) {
+                    it.write(value.toString())
+                    it.newLine()
+                } else minOften = value
+        }
+        for (i in 1..max) {
+            it.write(minOften.toString())
+            it.newLine()
+        }
+    }
+}
+/*
 /** Время исполнения = O(n^2) **/
+/** Падает по времени при ~150000 и более значениях в inputName **/
 fun sortTemperatures(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         val temperatures: MutableList<Float> = mutableListOf()
@@ -151,6 +181,10 @@ fun sortTemperatures(inputName: String, outputName: String) {
         }
     }
 }
+*/
+
+
+
 
 /**
  * Сортировка последовательности
