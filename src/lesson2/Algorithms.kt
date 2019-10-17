@@ -30,6 +30,7 @@ import java.io.File
  */
 
 /** Время реализации = O(n) **/
+/** Затраты памяти = O(1) **/
 fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
     var bestPrice = 0
     var lowPrice = 0
@@ -69,7 +70,7 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
     } catch (e: NumberFormatException) {
         throw IllegalArgumentException()
     }
-    return Pair(bestPriceFirstIndex, bestPriceLastIndex)
+    return bestPriceFirstIndex to bestPriceLastIndex
 }
 
 /**
@@ -123,6 +124,7 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
  */
 
 /** Время реализации = O(n^2) **/
+/** Затраты памяти = O(n) **/
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
     val people = mutableListOf<Boolean>()
     var killed = -1
@@ -175,6 +177,31 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Единица простым числом не считается.
  */
 
+/** Время реализации = O(n) **/
+/** Затраты памяти = с ростом limit -> O(n) **/
+fun calcPrimesNumber(limit: Int): Int {
+    if (limit <= 1) return 0
+    val numbers = mutableListOf<Boolean>()
+    val simples = mutableSetOf<Int>()
+    repeat(limit + 1) { numbers.add(true) }
+    for (i in 2..limit) {
+        if (numbers[i]) {
+            simples.add(i)
+            numbers[i] = false
+        }
+        if (i <= limit / 2)
+            for (elem in simples) {
+                val composition = elem * i.toLong()
+                if (elem <= i && composition <= limit) {
+                    numbers[elem * i] = false
+                }
+            }
+    }
+    return simples.size
+}
+
+
+/*
 /* Время реализации = O(n^2) (???) */
 fun calcPrimesNumber(limit: Int): Int {
     if (limit <= 1) return 0
@@ -189,6 +216,7 @@ fun calcPrimesNumber(limit: Int): Int {
         }
     return simples.size
 }
+*/
 
 /**
  * Балда
