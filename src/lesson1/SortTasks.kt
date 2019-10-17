@@ -65,7 +65,7 @@ fun sortTimes(inputName: String, outputName: String) {
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
 
-// O(n*log(n)) - ???
+/** Время реализации = O(n*log(n)) **/
 fun sortAddresses(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         val citizens: MutableMap<Pair<String, Int>, List<String>> = mutableMapOf()
@@ -124,7 +124,7 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 
-/** Время реализации >= O(n*log(n)) **/
+/** Время реализации = O(n*log(n)) **/
 fun sortTemperatures(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         val temperatures: MutableMap<Float, Int> = mutableMapOf()
@@ -145,7 +145,7 @@ fun sortTemperatures(inputName: String, outputName: String) {
     }
 }
 /*
-/** Время исполнения = O(n^2) **/
+/** Время реализации = O(n^2) **/
 /** Падает по времени при ~150000 и более значениях в inputName **/
 fun sortTemperatures(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
@@ -207,8 +207,7 @@ fun sortTemperatures(inputName: String, outputName: String) {
  * 2
  */
 
-/** Время исполнения ~ O(n) **/
-
+/** Время реализации = O(n) **/
 fun sortSequence(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
         val repeats = mutableMapOf<Int, Int>()
@@ -259,7 +258,7 @@ fun sortSequence(inputName: String, outputName: String) {
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
  */
 
-/** Время исполнения - O(n*log(n)) **/
+/** Время реализации = O(n*log(n)) **/
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
     for (i in 0 until first.size) {
         second[i] = first[i]
