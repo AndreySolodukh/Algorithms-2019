@@ -143,7 +143,7 @@ fun sortTemperatures(inputName: String, outputName: String) {
     }
     File(outputName).bufferedWriter().use {
         for (i in 0..7730) {
-            for (j in 0..temperatureRepeats[i]) {
+            for (j in 1..temperatureRepeats[i]) {
                 it.write(((i - 2730) / 10.0).toString())
                 it.newLine()
             }
