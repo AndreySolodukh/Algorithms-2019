@@ -2,6 +2,8 @@
 
 package lesson2
 
+import java.io.File
+
 /**
  * Получение наибольшей прибыли (она же -- поиск максимального подмассива)
  * Простая
@@ -26,8 +28,48 @@ package lesson2
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+
+/** Время реализации = O(n) **/
 fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
-    TODO()
+    var bestPrice = 0
+    var lowPrice = 0
+    var lowPriceIndex = 1
+    var bestPriceFirstIndex = 1
+    var bestPriceLastIndex = 2
+    var lineNumber = 1
+    try {
+        for (line in File(inputName).readLines()) {
+            val price = line.toInt()
+            when (lineNumber) {
+                1 -> {
+                    bestPrice = -price
+                    lowPrice = price
+                }
+                2 -> {
+                    bestPrice += line.toInt()
+                    if (price < lowPrice) {
+                        lowPrice = price
+                        lowPriceIndex = lineNumber
+                    }
+                }
+                else -> {
+                    if (price - lowPrice > bestPrice) {
+                        bestPriceFirstIndex = lowPriceIndex
+                        bestPriceLastIndex = lineNumber
+                        bestPrice = price - lowPrice
+                    } else
+                        if (price < lowPrice) {
+                            lowPrice = price
+                            lowPriceIndex = lineNumber
+                        }
+                }
+            }
+            lineNumber++
+        }
+    } catch (e: NumberFormatException) {
+        throw IllegalArgumentException()
+    }
+    return Pair(bestPriceFirstIndex, bestPriceLastIndex)
 }
 
 /**
@@ -79,8 +121,24 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
  * Общий комментарий: решение из Википедии для этой задачи принимается,
  * но приветствуется попытка решить её самостоятельно.
  */
+
+/** Время реализации = O(n^2) **/
 fun josephTask(menNumber: Int, choiceInterval: Int): Int {
-    TODO()
+    val people = mutableListOf<Boolean>()
+    var killed = -1
+    for (i in 1..menNumber) people.add(false)
+    for (i in 0..menNumber - 2) {
+        for (j in 1..choiceInterval) {
+            killed++
+            if (killed == menNumber) killed = 0
+            while (people[killed]) {
+                killed++
+                if (killed == menNumber) killed = 0
+            }
+        }
+        people[killed] = true
+    }
+    return people.indexOf(people.first { !it }) + 1
 }
 
 /**
@@ -96,6 +154,14 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  */
 fun longestCommonSubstring(first: String, second: String): String {
     TODO()
+    /*
+    var bestSubstring = ""
+    var substring = ""
+    var index = 0
+    for (i in 0 until first.length) {
+    }
+    return bestSubstring
+    */
 }
 
 /**
@@ -108,8 +174,20 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Справка: простым считается число, которое делится нацело только на 1 и на себя.
  * Единица простым числом не считается.
  */
+
+/* Время реализации = O(n^2) (???) */
 fun calcPrimesNumber(limit: Int): Int {
-    TODO()
+    if (limit <= 1) return 0
+    val simples = mutableSetOf(2)
+    for (i in 2..limit)
+        for (elem in simples) {
+            if (elem > i / 2) {
+                simples.add(i)
+                break
+            }
+            if (i % elem == 0) break
+        }
+    return simples.size
 }
 
 /**
