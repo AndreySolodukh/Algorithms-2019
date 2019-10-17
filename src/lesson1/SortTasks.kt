@@ -66,28 +66,32 @@ fun sortTimes(inputName: String, outputName: String) {
  */
 
 /** Время реализации = O(n*log(n)) **/
+/** Затраты памяти = до O(n) **/
 fun sortAddresses(inputName: String, outputName: String) {
-    File(outputName).bufferedWriter().use {
-        val citizens: MutableMap<Pair<String, Int>, List<String>> = mutableMapOf()
-        for (line in File(inputName).readLines()) {
-            try {
-                val roomer = line.split(" - ")[0]
-                val house = line.split(" - ")[1].split(" ")[0]
-                // Проверка на "лишние" элементы после полной записи формата "фамилия имя - дом номер"
-                if (line.split(" ").size != 5) {
-                    throw IllegalArgumentException()
-                }
-                // Проверка формата номера дома
-                val number = line.split(" - ")[1].split(" ")[1].toInt()
-                citizens[Pair(house, number)] = (citizens[Pair(house, number)] ?: listOf()) + roomer
-            } catch (e: NumberFormatException) {
+    val citizens = mutableMapOf<Pair<String, Int>, MutableList<String>>()
+    for (line in File(inputName).readLines()) {
+        try {
+            val roomer = line.split(" - ")[0]
+            val house = line.split(" - ")[1].split(" ")[0]
+            // Проверка на "лишние" элементы после полной записи формата "фамилия имя - дом номер"
+            if (line.split(" ").size != 5) {
                 throw IllegalArgumentException()
             }
+            // Проверка формата номера дома
+            val number = line.split(" - ")[1].split(" ")[1].toInt()
+            if (citizens[house to number] == null) {
+                citizens[house to number] = mutableListOf(roomer)
+            } else
+                citizens[house to number]!!.add(roomer)
+        } catch (e: NumberFormatException) {
+            throw IllegalArgumentException()
         }
+    }
+    File(outputName).bufferedWriter().use {
         for (elem in citizens.keys.sortedBy { it.second }.sortedBy { it.first }) {
             it.write("${elem.first} ${elem.second}")
             it.write(" - ")
-            it.write(citizens[elem]!!.sorted().toString().drop(1).dropLast(1))
+            it.write(citizens[elem]!!.sorted().joinToString(separator = ", "))
             it.newLine()
         }
     }
@@ -124,57 +128,28 @@ fun sortAddresses(inputName: String, outputName: String) {
  * 121.3
  */
 
-/** Время реализации = O(n*log(n)) **/
+/** Время реализации = O(n) **/
+/** Затраты памяти = O(1) **/
 fun sortTemperatures(inputName: String, outputName: String) {
-    File(outputName).bufferedWriter().use {
-        val temperatures: MutableMap<Float, Int> = mutableMapOf()
-        try {
-            for (line in File(inputName).readLines()) {
-                val value = line.toFloat()
-                temperatures[value] = (temperatures[value] ?: 0) + 1
-            }
-        } catch (e: NumberFormatException) {
-            throw IllegalArgumentException()
+    val temperatureRepeats = mutableListOf<Int>()
+    repeat(7731) { temperatureRepeats.add(0) }
+    try {
+        for (line in File(inputName).readLines()) {
+            val value = (line.toFloat() * 10).toInt() + 2730
+            temperatureRepeats[value]++
         }
-        for ((value, repeats) in temperatures.toSortedMap()) {
-            for (i in 1..repeats) {
-                it.write(value.toString())
+    } catch (e: NumberFormatException) {
+        throw IllegalArgumentException()
+    }
+    File(outputName).bufferedWriter().use {
+        for (i in 0..7730) {
+            for (j in 0..temperatureRepeats[i]) {
+                it.write(((i - 2730) / 10.0).toString())
                 it.newLine()
             }
         }
     }
 }
-/*
-/** Время реализации = O(n^2) **/
-/** Падает по времени при ~150000 и более значениях в inputName **/
-fun sortTemperatures(inputName: String, outputName: String) {
-    File(outputName).bufferedWriter().use {
-        val temperatures: MutableList<Float> = mutableListOf()
-        try {
-            for (line in File(inputName).readLines()) {
-                val value = line.toFloat()
-                when {
-                    temperatures.isEmpty() || (value >= temperatures.last()) -> temperatures.add(value)
-                    value <= temperatures.first() -> temperatures.add(0, value)
-                    else ->
-                        for (i in 0 until temperatures.size)
-                            if ((value >= temperatures[i]) && (value <= temperatures[i + 1])) {
-                                temperatures.add(i + 1, value)
-                                break
-                            }
-                }
-            }
-        } catch (e: NumberFormatException) {
-            throw IllegalArgumentException()
-        }
-        for (elem in temperatures) {
-            it.write(elem.toString())
-            it.newLine()
-        }
-    }
-}
-*/
-
 
 /**
  * Сортировка последовательности
@@ -208,29 +183,30 @@ fun sortTemperatures(inputName: String, outputName: String) {
  */
 
 /** Время реализации = O(n) **/
+/** Затраты памяти = от O(n) до O(n^2) в зависимости от входных данных **/
 fun sortSequence(inputName: String, outputName: String) {
-    File(outputName).bufferedWriter().use {
-        val repeats = mutableMapOf<Int, Int>()
-        var maxRepeats = 0
-        var minOften: Int? = null
-        try {
-            for (line in File(inputName).readLines()) {
-                val value = line.toInt()
-                repeats[value] = (repeats[value] ?: 0) + 1
-                if ((minOften == null) ||
-                    (repeats[value]!! > maxRepeats) ||
-                    (repeats[value]!! == maxRepeats && value < minOften)
-                ) {
-                    maxRepeats = repeats[value]!!
-                    minOften = value
-                }
-            }
-        } catch (e: NumberFormatException) {
-            throw IllegalArgumentException()
-        }
-
-
+    val values = mutableListOf<String>()
+    val repeats = mutableMapOf<Int, Int>()
+    var maxRepeats = 0
+    var minOften: Int? = null
+    try {
         for (line in File(inputName).readLines()) {
+            values.add(line)
+            val value = line.toInt()
+            repeats[value] = (repeats[value] ?: 0) + 1
+            if ((minOften == null) ||
+                (repeats[value]!! > maxRepeats) ||
+                (repeats[value]!! == maxRepeats && value < minOften)
+            ) {
+                maxRepeats = repeats[value]!!
+                minOften = value
+            }
+        }
+    } catch (e: NumberFormatException) {
+        throw IllegalArgumentException()
+    }
+    File(outputName).bufferedWriter().use {
+        for (line in values) {
             if (line != minOften.toString()) {
                 it.write(line)
                 it.newLine()
