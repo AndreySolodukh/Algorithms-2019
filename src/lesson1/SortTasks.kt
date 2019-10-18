@@ -134,7 +134,8 @@ fun sortAddresses(inputName: String, outputName: String) {
 /** Время реализации = O(n) **/
 /** Затраты памяти = O(1) **/
 fun sortTemperatures(inputName: String, outputName: String) {
-    val temperatureRepeats = intArrayOf()
+    val temperatureRepeats = mutableListOf<Int>()
+    repeat(7731) { temperatureRepeats.add(0) }
     try {
         val file = File(inputName).bufferedReader()
         var line = file.readLine()
