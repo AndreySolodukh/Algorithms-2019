@@ -39,7 +39,9 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
     var bestPriceLastIndex = 2
     var lineNumber = 1
     try {
-        for (line in File(inputName).readLines()) {
+        val file = File(inputName).bufferedReader()
+        var line = file.readLine()
+        while (line != null) {
             val price = line.toInt()
             when (lineNumber) {
                 1 -> {
@@ -66,6 +68,7 @@ fun optimizeBuyAndSell(inputName: String): Pair<Int, Int> {
                 }
             }
             lineNumber++
+            line = file.readLine()
         }
     } catch (e: NumberFormatException) {
         throw IllegalArgumentException()
@@ -177,7 +180,7 @@ fun longestCommonSubstring(first: String, second: String): String {
  * Единица простым числом не считается.
  */
 
-/** Время реализации = O(n) **/
+/** Время реализации = O(n*log(log(n))) **/
 /** Затраты памяти = с ростом limit -> O(n) **/
 fun calcPrimesNumber(limit: Int): Int {
     if (limit <= 1) return 0

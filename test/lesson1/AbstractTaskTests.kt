@@ -324,6 +324,19 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        // 5000 значений
+        try {
+            sortSequence("input/seq_in6.txt", "temp.txt")
+            assertFileContent("temp.txt", File("input/seq_out6.txt").readLines())
+        } finally {
+            File("temp.txt").delete()
+        }
+        // ошибка во входном файле
+        try {
+            assertThrows(IllegalArgumentException::class.java) { sortSequence("input/seq_in7.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
 
         fun testGeneratedSequence(totalSize: Int, answerSize: Int): PerfResult<Unit> {
             try {
@@ -370,9 +383,17 @@ abstract class AbstractTaskTests : AbstractFileTests() {
     }
 
     protected fun mergeArrays(mergeArrays: (Array<Int>, Array<Int?>) -> Unit) {
-        val result = arrayOf(null, null, null, null, null, 1, 3, 9, 13, 18, 23)
+        var result = arrayOf(null, null, null, null, null, 1, 3, 9, 13, 18, 23)
         mergeArrays(arrayOf(4, 9, 15, 20, 23), result)
         assertArrayEquals(arrayOf(1, 3, 4, 9, 9, 13, 15, 18, 20, 23, 23), result)
+
+        result = arrayOf(null, null, null, null, null, null, null, null, 1, 3, 9, 13, 18, 23, 50, 56)
+        mergeArrays(arrayOf(55, 59, 52, 8, 30, 46, 0, 25), result)
+        assertArrayEquals(arrayOf(0, 1, 3, 8, 9, 13, 18, 23, 25, 30, 46, 50, 52, 55, 56, 59), result)
+
+        result = arrayOf(null, null, null, 1, 20)
+        mergeArrays(arrayOf(3, 4, 5), result)
+        assertArrayEquals(arrayOf(1, 3, 4, 5, 20), result)
 
         fun testGeneratedArrays(
             firstSize: Int,

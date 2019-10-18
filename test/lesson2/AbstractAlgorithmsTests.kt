@@ -1,5 +1,7 @@
 package lesson2
 
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.assertThrows
 import java.io.BufferedWriter
 import java.io.File
 import java.util.*
@@ -26,7 +28,7 @@ abstract class AbstractAlgorithmsTests {
             }
         }
         val (minIndex, maxIndex) =
-            if (firstIndex < secondIndex) firstIndex to secondIndex else secondIndex to firstIndex
+                if (firstIndex < secondIndex) firstIndex to secondIndex else secondIndex to firstIndex
         prices[minIndex] = minPrice
         prices[maxIndex] = maxPrice
 
@@ -46,6 +48,11 @@ abstract class AbstractAlgorithmsTests {
         assertEquals(3 to 4, optimizeBuyAndSell("input/buysell_in1.txt"))
         assertEquals(8 to 12, optimizeBuyAndSell("input/buysell_in2.txt"))
         assertEquals(3 to 4, optimizeBuyAndSell("input/buysell_in3.txt"))
+        // 400 значений от 11000 до 12000
+        assertEquals(194 to 237, optimizeBuyAndSell("input/buysell_in4.txt"))
+        // неверный формат строки
+        Assertions.assertThrows(IllegalArgumentException::class.java) { optimizeBuyAndSell("input/buysell_in5.txt") }
+
         try {
             val expectedAnswer = generatePrices(1000)
             assertEquals(expectedAnswer, optimizeBuyAndSell("temp_prices.txt"))
@@ -66,6 +73,10 @@ abstract class AbstractAlgorithmsTests {
         assertEquals(50000000, josephTask(50000000, 1))
         assertEquals(3, josephTask(8, 5))
         assertEquals(28, josephTask(40, 3))
+        assertEquals(47, josephTask(50, 4))
+        assertEquals(54561, josephTask(65536, 9))
+        assertEquals(3377, josephTask(10000, 9999))
+
         var menNumber = 2
         for (i in 1..20) {
             assertEquals(1, josephTask(menNumber, 2))
@@ -144,6 +155,9 @@ abstract class AbstractAlgorithmsTests {
         assertEquals(148933, calcPrimesNumber(2000000))
         assertEquals(348513, calcPrimesNumber(5000000))
         assertEquals(664579, calcPrimesNumber(10000000))
+        assertEquals(500, calcPrimesNumber(3575))
+        assertEquals(6542, calcPrimesNumber(65536))
+        assertEquals(22924, calcPrimesNumber(261100))
     }
 
     fun baldaSearcher(baldaSearcher: (String, Set<String>) -> Set<String>) {
