@@ -180,7 +180,7 @@ fun longestCommonSubstring(first: String, second: String): String {
             }
             secondWorkable = secondWorkable.drop(string.length)
             match = secondWorkable.indexOf(first[i])
-            if (string > bestSubstring) {
+            if (string.length > bestSubstring.length) {
                 bestSubstring = string
                 skips = string.length - 1
             }
