@@ -88,6 +88,16 @@ abstract class AbstractAlgorithmsTests {
         assertEquals("", longestCommonSubstring("мой мир", "я"))
         assertEquals("зд", longestCommonSubstring("здравствуй мир", "мы здесь"))
         assertEquals("СЕРВАТОР", longestCommonSubstring("ОБСЕРВАТОРИЯ", "КОНСЕРВАТОРЫ"))
+        assertEquals("ART", longestCommonSubstring("ARTICLE", "QUARTUS"))
+        assertEquals(
+            " MINECRAFT ", longestCommonSubstring(
+                "Current MINECRAFT version is 1.4.4",
+                "MY ONLY LOVE IS MINECRAFT OH BOI OH BOI OH BOI"
+            )
+        )
+        assertEquals("", longestCommonSubstring("Здесь", "Нiт повторов"))
+        assertEquals("Одинаковые строки", longestCommonSubstring("Одинаковые строки", "Одинаковые строки"))
+
         assertEquals(
             "огда ", longestCommonSubstring(
                 """
