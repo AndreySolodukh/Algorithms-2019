@@ -169,20 +169,26 @@ fun longestCommonSubstring(first: String, second: String): String {
             continue
         }
         var secondWorkable = second
-        var match = secondWorkable.indexOf(first[i])
-        while (match > -1) {
-            secondWorkable = secondWorkable.drop(match)
-            var string = secondWorkable.first().toString()
-            for (j in 1 until secondWorkable.length) {
-                if (first[i + j] == secondWorkable[j])
-                    string += secondWorkable[j]
-                else break
-            }
-            secondWorkable = secondWorkable.drop(string.length)
-            match = secondWorkable.indexOf(first[i])
-            if (string.length > bestSubstring.length) {
-                bestSubstring = string
-                skips = string.length - 1
+        val matches = mutableSetOf<Int>()
+        var dropped = 0
+        while (secondWorkable.indexOf(first[i]) != -1) {
+            matches.add(secondWorkable.indexOf(first[i]) + dropped)
+            dropped += secondWorkable.indexOf(first[i]) + 1
+            secondWorkable = secondWorkable.drop(secondWorkable.indexOf(first[i]) + 1)
+        }
+        for (index in matches) {
+            var string = ""
+            secondWorkable = second.drop(index)
+            var current = 0
+            for (elem in first.drop(i)) {
+                if (current < secondWorkable.length && elem == secondWorkable[current]) {
+                    string += elem
+                    current++
+                } else {
+                    if (string.length > bestSubstring.length) bestSubstring = string
+                    if (skips < string.length) skips = string.length
+                    break
+                }
             }
         }
     }
