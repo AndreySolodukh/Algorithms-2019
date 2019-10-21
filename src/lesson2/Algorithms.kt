@@ -203,24 +203,6 @@ fun calcPrimesNumber(limit: Int): Int {
     return simples.size
 }
 
-
-/*
-/* Время реализации = O(n^2) (???) */
-fun calcPrimesNumber(limit: Int): Int {
-    if (limit <= 1) return 0
-    val simples = mutableSetOf(2)
-    for (i in 2..limit)
-        for (elem in simples) {
-            if (elem > i / 2) {
-                simples.add(i)
-                break
-            }
-            if (i % elem == 0) break
-        }
-    return simples.size
-}
-*/
-
 /**
  * Балда
  * Сложная
@@ -247,6 +229,49 @@ fun calcPrimesNumber(limit: Int): Int {
  * В файле буквы разделены пробелами, строки -- переносами строк.
  * Остальные символы ни в файле, ни в словах не допускаются.
  */
+
 fun baldaSearcher(inputName: String, words: Set<String>): Set<String> {
     TODO()
 }
+/*    val table = mutableListOf<List<Char>>()
+    val file = File(inputName).bufferedReader()
+    var line = file.readLine()
+    val result = mutableSetOf<String>()
+    while (line != null) {
+        val chars = line.split(" ")
+        if (chars.all { it.length == 1 && (it[0] in ('A'..'Z') || it[0] in ('А'..'Я')) })
+            table.add(chars.map { it[0] })
+        else
+            throw IllegalArgumentException()
+        line = file.readLine()
+    }
+    for (word in words) {
+        val coordinates = mutableSetOf<Pair<Int, Int>>()
+        for (x in 0 until table.size)
+            for (y in 0 until table[x].size)
+                if ((x to y) !in coordinates && table[x][y] == word.first()) {
+                    coordinates.add(x to y)
+                    var number = 1
+                    var symbol = word[number]
+                    var currentX = x
+                    var currentY = y
+                    while (symbol != '0') {
+                        val currentCoords = mutableSetOf<Pair<Int, Int>>()
+                        for (yy in currentY - 1..currentY + 1)
+                            for (xx in currentX - 1..currentX + 1)
+                                if ((xx to yy) !in currentCoords && table[xx][yy] == symbol) {
+
+                                }
+                        number++
+                        symbol = if (number < word.length && symbol != '0')
+                            word[number]
+                        else {
+                            result.add(word)
+                            '0'
+                        }
+                    }
+                }
+    }
+
+}
+    */

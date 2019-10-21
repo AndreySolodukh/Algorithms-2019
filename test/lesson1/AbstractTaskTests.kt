@@ -47,6 +47,19 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+        // 172800 элементов - вдвое больше количества возможных вариаций
+        try {
+            sortTimes("input/time_in4.txt", "temp.txt")
+            assertFileContent("temp.txt", File("input/time_out4.txt").readLines())
+        } finally {
+            File("temp.txt").delete()
+        }
+        // Ошибка в формате строки
+        try {
+            assertThrows(IllegalArgumentException::class.java) { sortTimes("input/time_in5.txt", "temp.txt") }
+        } finally {
+            File("temp.txt").delete()
+        }
 
     }
 

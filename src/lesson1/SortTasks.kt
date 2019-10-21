@@ -34,9 +34,43 @@ import java.io.File
  *
  * В случае обнаружения неверного формата файла бросить любое исключение.
  */
+
+/**
+ * Самое простое и прямолинейное решение - линейное время и const-память,
+ *  но приходится хранить сразу ~86400 элементов.
+ */
+/** Время реализации = O(n) **/
+/** Затраты памяти = до O(1) **/
 fun sortTimes(inputName: String, outputName: String) {
-    TODO()
+    val moments = mutableMapOf<String, Int>()
+    val hours: Set<Byte> = setOf(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+    for (meridiem in setOf("AM", "PM"))
+        for (hour in hours)
+            for (minute in 0..59)
+                for (second in 0..59) {
+                    val time = (String.format("%02d:%02d:%02d %s", hour, minute, second, meridiem))
+                    moments[time] = 0
+                }
+    try {
+        val file = File(inputName).bufferedReader()
+        var line = file.readLine()
+        while (line != null) {
+            moments[line] = moments[line]!! + 1
+            line = file.readLine()
+        }
+    } catch (e: NullPointerException) {
+        throw IllegalArgumentException()
+    }
+    File(outputName).bufferedWriter().use {
+        for ((time, repeats) in moments)
+            for (i in 1..repeats) {
+                it.write(time)
+                it.newLine()
+            }
+    }
+
 }
+
 
 /**
  * Сортировка адресов
@@ -134,8 +168,7 @@ fun sortAddresses(inputName: String, outputName: String) {
 /** Время реализации = O(n) **/
 /** Затраты памяти = O(1) **/
 fun sortTemperatures(inputName: String, outputName: String) {
-    val temperatureRepeats = mutableListOf<Int>()
-    repeat(7731) { temperatureRepeats.add(0) }
+    val temperatureRepeats = IntArray(7731)
     try {
         val file = File(inputName).bufferedReader()
         var line = file.readLine()
