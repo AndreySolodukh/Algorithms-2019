@@ -161,6 +161,7 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
 /** Время реализации = O(n^2) (???) **/
 /** Затраты памяти = O(n) (???) **/
 fun longestCommonSubstring(first: String, second: String): String {
+    if (first == second) return first
     var bestSubstring = ""
     var skips = 0
     for (i in 0 until first.length) {
