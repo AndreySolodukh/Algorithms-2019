@@ -187,7 +187,7 @@ fun longestCommonSubstring(first: String, second: String): String {
                     current++
                 } else {
                     if (string.length > bestSubstring.length) bestSubstring = string
-                    if (skips < string.length) skips = string.length
+                    if (skips < string.length) skips = string.length - 1
                     break
                 }
             }
