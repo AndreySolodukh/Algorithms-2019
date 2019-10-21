@@ -279,26 +279,28 @@ fun sortSequence(inputName: String, outputName: String) {
 /** Время реализации = O(n) **/
 /** Затраты памяти = O(n) **/
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    // Так и не придумал, как задать пустой массив Array<T>
-    val result = second
     var currentIndex = 0
     var resultIndex = 0
     for (i in first.size until second.size) {
         while (first[currentIndex] <= second[i]!!) {
-            result[resultIndex] = first[currentIndex]
+            second[resultIndex] = first[currentIndex]
             resultIndex++
             currentIndex++
+            if (currentIndex == first.size) {
+                for (j in i until second.size) {
+                    second[resultIndex] = second[j]
+                    resultIndex++
+                }
+                return
+            }
         }
-        result[resultIndex] = second[i]!!
+        second[resultIndex] = second[i]!!
         resultIndex++
         if (i == second.size - 1)
             for (j in currentIndex until first.size) {
-                result[resultIndex] = first[j]
+                second[resultIndex] = first[j]
                 resultIndex++
             }
     }
-    for (i in 0 until second.size)
-        second[i] = result[i]
 }
-
 

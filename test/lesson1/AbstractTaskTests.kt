@@ -401,7 +401,7 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         assertArrayEquals(arrayOf(1, 3, 4, 9, 9, 13, 15, 18, 20, 23, 23), result)
 
         result = arrayOf(null, null, null, null, null, null, null, null, 1, 3, 9, 13, 18, 23, 50, 56)
-        mergeArrays(arrayOf(55, 59, 52, 8, 30, 46, 0, 25), result)
+        mergeArrays(arrayOf(0, 8, 25, 30, 46, 52, 55, 59), result)
         assertArrayEquals(arrayOf(0, 1, 3, 8, 9, 13, 18, 23, 25, 30, 46, 50, 52, 55, 56, 59), result)
 
         result = arrayOf(null, null, null, 1, 20)
