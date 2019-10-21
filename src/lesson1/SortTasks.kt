@@ -276,12 +276,23 @@ fun sortSequence(inputName: String, outputName: String) {
  * Результат: second = [1 3 4 9 9 13 15 20 23 28]
  */
 
-/** Время реализации = O(n*log(n)) **/
+/** Время реализации = O(n) **/
+/** Затраты памяти = O(n) **/
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
-    for (i in 0 until first.size) {
-        second[i] = first[i]
+    lateinit var result: Array<T>
+    var currentIndex = 0
+    for (i in first.size until second.size) {
+        while (first[currentIndex] <= second[i]!!) {
+            result += first[currentIndex]
+            currentIndex++
+        }
+        result += second[i]!!
+        if (i == second.size - 1)
+            for (j in currentIndex until first.size)
+                result += first[j]
     }
-    second.sort()
+    for (i in 0 until second.size)
+        second[i] = result[i]
 }
 
 
