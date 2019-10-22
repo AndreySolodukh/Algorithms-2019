@@ -158,8 +158,8 @@ fun josephTask(menNumber: Int, choiceInterval: Int): Int {
  * вернуть ту из них, которая встречается раньше в строке first.
  */
 
-/** Время реализации = O(n^2) (???) **/
-/** Затраты памяти = O(n) (???) **/
+/** Время реализации = O(n^2) **/
+/** Затраты памяти = O(n) **/
 fun longestCommonSubstring(first: String, second: String): String {
     if (first == second) return first
     var bestSubstring = ""
@@ -211,23 +211,21 @@ fun longestCommonSubstring(first: String, second: String): String {
 /** Затраты памяти = с ростом limit -> O(n) **/
 fun calcPrimesNumber(limit: Int): Int {
     if (limit <= 1) return 0
-    val numbers = mutableListOf<Boolean>()
-    val simples = mutableSetOf<Int>()
-    repeat(limit + 1) { numbers.add(true) }
+    val numbers = MutableList(limit + 1) { true }
+    var primes = 0
     for (i in 2..limit) {
         if (numbers[i]) {
-            simples.add(i)
+            primes++
             numbers[i] = false
-        }
-        if (i <= limit / 2)
-            for (elem in simples) {
-                val composition = elem * i.toLong()
-                if (elem <= i && composition <= limit) {
-                    numbers[elem * i] = false
-                }
+            for (j in 1..limit / 2) {
+                if (i * j <= limit)
+                    numbers[i * j] = false
+                else
+                    break
             }
+        }
     }
-    return simples.size
+    return primes
 }
 
 /**

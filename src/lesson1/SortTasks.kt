@@ -42,29 +42,31 @@ import java.io.File
 /** Время реализации = O(n) **/
 /** Затраты памяти = до O(1) **/
 fun sortTimes(inputName: String, outputName: String) {
-    val moments = mutableMapOf<String, Int>()
-    val hours: Set<Byte> = setOf(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
-    for (meridiem in setOf("AM", "PM"))
+    val repeats = mutableMapOf<String, Int>()
+    val moments = mutableListOf<String>()
+    val hours = listOf<Byte>(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+    for (meridiem in listOf("AM", "PM"))
         for (hour in hours)
             for (minute in 0..59)
                 for (second in 0..59) {
                     val time = (String.format("%02d:%02d:%02d %s", hour, minute, second, meridiem))
-                    moments[time] = 0
+                    repeats[time] = 0
+                    moments.add(time)
                 }
     try {
         val file = File(inputName).bufferedReader()
         var line = file.readLine()
         while (line != null) {
-            moments[line] = moments[line]!! + 1
+            repeats[line] = repeats[line]!! + 1
             line = file.readLine()
         }
     } catch (e: NullPointerException) {
         throw IllegalArgumentException()
     }
     File(outputName).bufferedWriter().use {
-        for ((time, repeats) in moments)
-            for (i in 1..repeats) {
-                it.write(time)
+        for (moment in moments)
+            for (i in 1..repeats[moment]!!) {
+                it.write(moment)
                 it.newLine()
             }
     }
@@ -277,7 +279,7 @@ fun sortSequence(inputName: String, outputName: String) {
  */
 
 /** Время реализации = O(n) **/
-/** Затраты памяти = O(n) **/
+/** Затраты памяти = O(1) **/
 fun <T : Comparable<T>> mergeArrays(first: Array<T>, second: Array<T?>) {
     var currentIndex = 0
     var resultIndex = 0
