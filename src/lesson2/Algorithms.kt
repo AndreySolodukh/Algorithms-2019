@@ -208,7 +208,7 @@ fun longestCommonSubstring(first: String, second: String): String {
  */
 
 /** Время реализации = O(n*log(log(n))) **/
-/** Затраты памяти = с ростом limit -> O(n) **/
+/** Затраты памяти = O(n) **/
 fun calcPrimesNumber(limit: Int): Int {
     if (limit <= 1) return 0
     val numbers = MutableList(limit + 1) { true }
