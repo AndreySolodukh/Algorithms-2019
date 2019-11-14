@@ -95,23 +95,61 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         }
     }
 
+    // Предполагается, что в эту функцию будут попадать только существующие узлы
+    private fun whosMyParent(kid: T, node: Node<T>): Node<T> {
+        if ((node.left != null && node.left!!.value == kid) ||
+            (node.right != null && node.right!!.value == kid)
+        ) return node
+        if (node.value < kid) return whosMyParent(kid, node.right!!)
+        return whosMyParent(kid, node.left!!)
+    }
+
+    private fun nextAfter(node: Node<T>, current: T?): T {
+        if (current == null) {
+            return if (node.left == null) {
+                node.value
+            } else nextAfter(node.left!!, current)
+        }
+        if (node.left != null &&
+            node.left!!.value == current &&
+            node.left!!.right == null
+        ) return node.value
+        return when {
+            node.value == current -> if (node.right != null) nextAfter(node.right!!, current)
+            else nextAfter(whosMyParent(current, root!!), current)
+            node.value > current -> if (node.left != null && node.left!!.value > current) nextAfter(
+                node.left!!,
+                current
+            )
+            else node.value
+            else -> nextAfter(whosMyParent(node.value, root!!), current)
+        }
+    }
+
+    private fun maxElem(node: Node<T>?): T? {
+        if (node == null) return null
+        return if (node.right != null) maxElem(node.right!!)
+        else node.value
+    }
+
     inner class BinaryTreeIterator internal constructor() : MutableIterator<T> {
+
+        private var current: T? = null
         /**
          * Проверка наличия следующего элемента
          * Средняя
          */
-        override fun hasNext(): Boolean {
-            // TODO
-            throw NotImplementedError()
-        }
+        override fun hasNext(): Boolean = (current != maxElem(root) && root != null)
 
         /**
          * Поиск следующего элемента
          * Средняя
          */
         override fun next(): T {
-            // TODO
-            throw NotImplementedError()
+            if (current == maxElem(root) || root == null) throw IndexOutOfBoundsException()
+            current = if (current == null) nextAfter(root!!, current)
+            else nextAfter(find(current!!)!!, current)
+            return current!!
         }
 
         /**
@@ -133,7 +171,14 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Очень сложная
      */
     override fun subSet(fromElement: T, toElement: T): SortedSet<T> {
-        TODO()
+        val set = mutableSetOf<T>()
+        val iterator = BinaryTreeIterator()
+        while (iterator.hasNext()) {
+            val value = iterator.next()
+            if (value >= fromElement && value < toElement) set.add(value)
+            if (value >= toElement) break
+        }
+        return set.toSortedSet()
     }
 
     /**
@@ -141,32 +186,14 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Сложная
      */
     override fun headSet(toElement: T): SortedSet<T> {
-        val sum = mutableSetOf<T>()
-
-        fun adder(node: Node<T>) {
-            sum.add(node.value)
-            if (node.right != null) adder(node.right!!)
-            if (node.left != null) adder(node.left!!)
+        val set = mutableSetOf<T>()
+        val iterator = BinaryTreeIterator()
+        while (iterator.hasNext()) {
+            val value = iterator.next()
+            if (value < toElement) set.add(value)
+            else break
         }
-
-        fun nodeWalker(node: Node<T>) {
-            if (node.left == null && node.right == null) {
-                if (node.value < toElement) sum.add(node.value)
-                return
-            }
-            when {
-                toElement > node.value -> {
-                    sum.add(node.value)
-                    if (node.left != null) adder(node.left!!)
-                    if (node.right != null) nodeWalker(node.right!!)
-                }
-                toElement == node.value -> if (node.left != null) adder(node.left!!)
-                else -> if (node.left != null) nodeWalker(node.left!!)
-            }
-        }
-
-        if (root != null) nodeWalker(root!!)
-        return sum.toSortedSet()
+        return set.toSortedSet()
     }
 
 
@@ -175,35 +202,13 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Сложная
      */
     override fun tailSet(fromElement: T): SortedSet<T> {
-        val sum = mutableSetOf<T>()
-
-        fun adder(node: Node<T>) {
-            sum.add(node.value)
-            if (node.right != null) adder(node.right!!)
-            if (node.left != null) adder(node.left!!)
+        val set = mutableSetOf<T>()
+        val iterator = BinaryTreeIterator()
+        while (iterator.hasNext()) {
+            val value = iterator.next()
+            if (value >= fromElement) set.add(value)
         }
-
-        fun nodeWalker(node: Node<T>) {
-            if (node.left == null && node.right == null) {
-                if (node.value >= fromElement) sum.add(node.value)
-                return
-            }
-            when {
-                fromElement < node.value -> {
-                    sum.add(node.value)
-                    if (node.right != null) adder(node.left!!)
-                    if (node.left != null) nodeWalker(node.right!!)
-                }
-                fromElement == node.value -> {
-                    sum.add(node.value)
-                    if (node.right != null) adder(node.right!!)
-                }
-                else -> if (node.right != null) nodeWalker(node.right!!)
-            }
-        }
-
-        if (root != null) nodeWalker(root!!)
-        return sum.toSortedSet()
+        return set.toSortedSet()
     }
 
     override fun first(): T {
