@@ -65,6 +65,18 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
     override fun remove(element: T): Boolean {
         TODO()
     }
+    /*
+    private fun remover(elem: T, node: Node<T>) {
+        when {
+            node.value < elem && node.left != null -> remover(elem, node.left!!)
+            node.value > elem && node.right != null -> remover(elem, node.right!!)
+            else -> {
+
+            }
+        }
+
+    }
+    */
 
     override operator fun contains(element: T): Boolean {
         val closest = find(element)
@@ -129,15 +141,69 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Сложная
      */
     override fun headSet(toElement: T): SortedSet<T> {
-        TODO()
+        val sum = mutableSetOf<T>()
+
+        fun adder(node: Node<T>) {
+            sum.add(node.value)
+            if (node.right != null) adder(node.right!!)
+            if (node.left != null) adder(node.left!!)
+        }
+
+        fun nodeWalker(node: Node<T>) {
+            if (node.left == null && node.right == null) {
+                if (node.value < toElement) sum.add(node.value)
+                return
+            }
+            when {
+                toElement > node.value -> {
+                    sum.add(node.value)
+                    if (node.left != null) adder(node.left!!)
+                    if (node.right != null) nodeWalker(node.right!!)
+                }
+                toElement == node.value -> if (node.left != null) adder(node.left!!)
+                else -> if (node.left != null) nodeWalker(node.left!!)
+            }
+        }
+
+        if (root != null) nodeWalker(root!!)
+        return sum.toSortedSet()
     }
+
 
     /**
      * Найти множество всех элементов больше или равных заданного
      * Сложная
      */
     override fun tailSet(fromElement: T): SortedSet<T> {
-        TODO()
+        val sum = mutableSetOf<T>()
+
+        fun adder(node: Node<T>) {
+            sum.add(node.value)
+            if (node.right != null) adder(node.right!!)
+            if (node.left != null) adder(node.left!!)
+        }
+
+        fun nodeWalker(node: Node<T>) {
+            if (node.left == null && node.right == null) {
+                if (node.value >= fromElement) sum.add(node.value)
+                return
+            }
+            when {
+                fromElement < node.value -> {
+                    sum.add(node.value)
+                    if (node.right != null) adder(node.left!!)
+                    if (node.left != null) nodeWalker(node.right!!)
+                }
+                fromElement == node.value -> {
+                    sum.add(node.value)
+                    if (node.right != null) adder(node.right!!)
+                }
+                else -> if (node.right != null) nodeWalker(node.right!!)
+            }
+        }
+
+        if (root != null) nodeWalker(root!!)
+        return sum.toSortedSet()
     }
 
     override fun first(): T {
