@@ -65,18 +65,6 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
     override fun remove(element: T): Boolean {
         TODO()
     }
-    /*
-    private fun remover(elem: T, node: Node<T>) {
-        when {
-            node.value < elem && node.left != null -> remover(elem, node.left!!)
-            node.value > elem && node.right != null -> remover(elem, node.right!!)
-            else -> {
-
-            }
-        }
-
-    }
-    */
 
     override operator fun contains(element: T): Boolean {
         val closest = find(element)
