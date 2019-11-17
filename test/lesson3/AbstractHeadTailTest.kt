@@ -5,11 +5,16 @@ import kotlin.test.*
 
 abstract class AbstractHeadTailTest {
     private lateinit var tree: SortedSet<Int>
+    private lateinit var custom: SortedSet<Int>
     private lateinit var randomTree: SortedSet<Int>
     private val randomTreeSize = 1000
     private val randomValues = mutableListOf<Int>()
 
     protected fun fillTree(create: () -> SortedSet<Int>) {
+        this.custom = create()
+        for (elem in setOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17).shuffled())
+            custom.add(elem)
+
         this.tree = create()
         //В произвольном порядке добавим числа от 1 до 10
         tree.add(5)
@@ -35,6 +40,15 @@ abstract class AbstractHeadTailTest {
 
 
     protected fun doHeadSetTest() {
+        var customSet = tree.headSet(10)
+        for (i in 1..17) {
+            if (i < 10) assertTrue(customSet.contains(i))
+            else assertFalse(customSet.contains(i))
+        }
+        customSet = tree.headSet(1)
+        for (i in 1..17)
+            assertFalse(customSet.contains(i))
+
         var set: SortedSet<Int> = tree.headSet(5)
         assertEquals(true, set.contains(1))
         assertEquals(true, set.contains(2))
@@ -55,6 +69,15 @@ abstract class AbstractHeadTailTest {
     }
 
     protected fun doTailSetTest() {
+        var customSet = custom.tailSet(10)
+        for (i in 1..17) {
+            if (i < 10) assertFalse(customSet.contains(i))
+            else assertTrue(customSet.contains(i))
+        }
+        customSet = custom.tailSet(1)
+        for (i in 1..17)
+            assertTrue(customSet.contains(i))
+
         var set: SortedSet<Int> = tree.tailSet(5)
         assertEquals(false, set.contains(1))
         assertEquals(false, set.contains(2))
@@ -74,6 +97,19 @@ abstract class AbstractHeadTailTest {
     }
 
     protected fun doHeadSetRelationTest() {
+        val customSet = custom.headSet(10)
+        assertEquals(9, customSet.size)
+        assertEquals(17, custom.size)
+        custom.add(-5)
+        assertTrue(customSet.contains(-5))
+        custom.add(-1)
+        assertTrue(customSet.contains(-1))
+        custom.add(19)
+        assertFalse(customSet.contains(19))
+        assertFailsWith<IllegalArgumentException> { customSet.add(12) }
+        assertEquals(11, customSet.size)
+        assertEquals(20, custom.size)
+
         val set: SortedSet<Int> = tree.headSet(7)
         assertEquals(6, set.size)
         assertEquals(10, tree.size)
@@ -89,6 +125,19 @@ abstract class AbstractHeadTailTest {
     }
 
     protected fun doTailSetRelationTest() {
+        val customSet = custom.tailSet(10)
+        assertEquals(8, customSet.size)
+        assertEquals(17, custom.size)
+        custom.add(22)
+        assertTrue(customSet.contains(22))
+        custom.add(19)
+        assertTrue(customSet.contains(19))
+        custom.add(-1)
+        assertFalse(customSet.contains(-1))
+        assertFailsWith<IllegalArgumentException> { customSet.add(0) }
+        assertEquals(10, customSet.size)
+        assertEquals(20, custom.size)
+
         val set: SortedSet<Int> = tree.tailSet(4)
         assertEquals(7, set.size)
         assertEquals(10, tree.size)
@@ -104,6 +153,19 @@ abstract class AbstractHeadTailTest {
     }
 
     protected fun doSubSetTest() {
+        val smallCustom = custom.subSet(5, 12)
+        for (i in 1..17) {
+            if (i in 5..11) assertTrue(smallCustom.contains(i))
+            else assertFalse(smallCustom.contains(i))
+        }
+
+        assertFailsWith<IllegalArgumentException> { smallCustom.add(1) }
+        assertFailsWith<IllegalArgumentException> { smallCustom.add(15) }
+
+        val allCustom = custom.subSet(-128, 128)
+        for (i in 1..17)
+            assertTrue(allCustom.contains(i))
+
         val smallSet: SortedSet<Int> = tree.subSet(3, 8)
         assertEquals(false, smallSet.contains(1))
         assertEquals(false, smallSet.contains(2))
@@ -134,6 +196,22 @@ abstract class AbstractHeadTailTest {
     }
 
     protected fun doSubSetRelationTest() {
+        val customSet = custom.subSet(10, 25)
+        assertEquals(8, customSet.size)
+        assertEquals(17, custom.size)
+        custom.add(22)
+        assertTrue(customSet.contains(22))
+        customSet.add(23)
+        assertTrue(custom.contains(23))
+        custom.add(-3)
+        assertFalse(customSet.contains(-3))
+        custom.add(30)
+        assertFalse(customSet.contains(30))
+        assertFailsWith<IllegalArgumentException> { customSet.add(5) }
+        assertFailsWith<IllegalArgumentException> { customSet.add(27) }
+        assertEquals(10, customSet.size)
+        assertEquals(21, custom.size)
+
         val set: SortedSet<Int> = tree.subSet(2, 15)
         assertEquals(9, set.size)
         assertEquals(10, tree.size)

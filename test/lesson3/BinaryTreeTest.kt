@@ -9,6 +9,24 @@ import kotlin.test.assertTrue
 
 class BinaryTreeTest {
     private fun testAdd(create: () -> CheckableSortedSet<Int>) {
+        val custom = create()
+        assertEquals(0, custom.size)
+        assertFalse(custom.contains(1))
+        for (elem in setOf(1, 3, 5, 7, 9, 11, 13, 15, 17).shuffled())
+            custom.add(elem)
+        assertEquals(9, custom.size)
+        assertTrue(custom.contains(1))
+        assertFalse(custom.contains(4))
+        for (elem in setOf(2, 4, 6, 8, 10, 12, 14, 16).shuffled())
+            custom.add(elem)
+        assertEquals(17, custom.size)
+        assertTrue(custom.contains(4))
+        custom.add(2)
+        custom.add(5)
+        assertEquals(17, custom.size)
+        assertEquals(1, custom.first())
+        assertEquals(17, custom.last())
+
         val tree = create()
         assertEquals(0, tree.size)
         assertFalse(tree.contains(5))
@@ -51,6 +69,11 @@ class BinaryTreeTest {
 
     private fun <T : Comparable<T>> createKotlinTree(): CheckableSortedSet<T> = KtBinaryTree()
 
+    /**
+    Не вижу омобого смысла в том, чтобы добавлять
+    что-либо в тесты с рандомной генерацией.
+     **/
+
     private fun testRemove(create: () -> CheckableSortedSet<Int>) {
         val random = Random()
         for (iteration in 1..100) {
@@ -60,6 +83,7 @@ class BinaryTreeTest {
             }
             val binarySet = create()
             assertFalse(binarySet.remove(42))
+            assertFalse(binarySet.remove(73))
             for (element in list) {
                 binarySet += element
             }

@@ -22,7 +22,13 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
 
     override var size = 0
         private set
-
+        get() {
+            var sum = 0
+            for (element in this)
+                if (match(element))
+                    sum++
+            return sum
+        }
 
     private class Node<T>(val value: T) {
 
@@ -75,18 +81,8 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
      * Удаление элемента в дереве
      * Средняя
      */
-
-
-    // Для дебага
-    private fun elements(): List<T> {
-        val list = mutableListOf<T>()
-        val iter = BinaryTreeIterator()
-        while (iter.hasNext()) {
-            list.add(iter.next())
-        }
-        return list
-    }
-
+    /** Время реализации = O(log(n)) **/
+    /** Затраты памяти = 1 **/
     override fun remove(element: T): Boolean {
         if (!contains(element)) return false
         if (element == root!!.value) {
@@ -202,6 +198,7 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
          * Средняя
          */
         /** Время реализации = до O(n) **/
+        // (время для last() = O(n) - ???)
         /** Затраты памяти = 1 **/
         override fun hasNext(): Boolean {
             return try {
@@ -216,6 +213,7 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
          * Средняя
          */
         /** Время реализации = до O(n) **/
+        // (время для first() = O(n) - ???)
         /** Затраты памяти = 1 **/
         override fun next(): T {
             if (!hasNext()) throw NoSuchElementException()
@@ -231,6 +229,9 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
          * Удаление следующего элемента
          * Сложная
          */
+        /** Время реализации = от O(log(n)) до O(n) **/
+        // (время для last() = O(n) - ???)
+        /** Затраты памяти = 1 **/
         override fun remove() {
             remove(current)
             val last = last()
@@ -241,61 +242,29 @@ class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSort
     override fun iterator(): MutableIterator<T> = BinaryTreeIterator()
 
     override fun comparator(): Comparator<in T>? = null
-/*
-    class SubSet<T : Comparable<T>>(
-        private var tree: KtBinaryTree<T>,
-        private var start: T?,
-        private var finish: T?
-    ) : KtBinaryTree<T>() {
 
-        private constructor() : this() {
-            this.tree = tree
-            this.start = start
-            this.finish = finish
-        }
-
-        private class SubSetIterator<T> : Iterator<T> {
-
-            val iter = tree.iterator()
-
-            override fun next(): T {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun hasNext(): Boolean {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-
-        }
-
-        private fun match(element: T) = (start == null || start <= element) && (finish == null || finish > element)
-
-        override fun contains(element: T) =
-            tree.contains(element) && match(element)
-
-        override fun add(element: T): Boolean = if (match(element)) tree.add(element)
-        else throw IllegalArgumentException()
-
-        // internal fun size(): Int
-    }
-*/
     /**
      * Найти множество всех элементов в диапазоне [fromElement, toElement)
      * Очень сложная
      */
+    /** Время реализации = 1 **/
+    /** Затраты памяти = 1 **/
     override fun subSet(fromElement: T, toElement: T): SortedSet<T> = KtBinaryTree(root, fromElement, toElement)
 
     /**
      * Найти множество всех элементов меньше заданного
      * Сложная
      */
+    /** Время реализации = 1 **/
+    /** Затраты памяти = 1 **/
     override fun headSet(toElement: T): SortedSet<T> = KtBinaryTree(root, null, toElement)
 
     /**
      * Найти множество всех элементов больше или равных заданного
      * Сложная
      */
+    /** Время реализации = 1 **/
+    /** Затраты памяти = 1 **/
     override fun tailSet(fromElement: T): SortedSet<T> = KtBinaryTree(root, fromElement, null)
 
     override fun first(): T {
