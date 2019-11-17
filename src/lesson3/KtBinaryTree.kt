@@ -1,17 +1,28 @@
 package lesson3
 
 import java.util.*
-import javax.swing.text.StyledEditorKit
 import kotlin.NoSuchElementException
 import kotlin.math.max
 
 // Attention: comparable supported but comparator is not
-class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSortedSet<T> {
+class KtBinaryTree<T : Comparable<T>>() : AbstractMutableSet<T>(), CheckableSortedSet<T> {
+
 
     private var root: Node<T>? = null
+    private var from: T? = null
+    private var to: T? = null
+
+    private constructor(root: Node<T>?, from: T?, to: T?) : this() {
+        this.root = root
+        this.from = from
+        this.to = to
+    }
+
+    private fun match(element: T) = (from == null || from!! <= element) && (to == null || to!! > element)
 
     override var size = 0
         private set
+
 
     private class Node<T>(val value: T) {
 
@@ -21,6 +32,7 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
     }
 
     override fun add(element: T): Boolean {
+        require(match(element))
         val closest = find(element)
         val comparison = if (closest == null) -1 else element.compareTo(closest.value)
         if (comparison == 0) {
@@ -64,6 +76,8 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Средняя
      */
 
+
+    // Для дебага
     private fun elements(): List<T> {
         val list = mutableListOf<T>()
         val iter = BinaryTreeIterator()
@@ -111,24 +125,24 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         if (node.left == null) return node.right
         if (node.right == null) return node.left
         val replace = findReplace(node)
-        if (!replace.second) {
+        return if (!replace.second) {
             val sum = Node(replace.first)
             sum.left = node.left
             sum.right = find(replace.first)!!.right
-            return sum
+            sum
         } else {
             remove(replace.first)
             size++
             val sum = Node(replace.first)
             sum.left = node.left
             sum.right = find(node.value)!!.right
-            return sum
+            sum
         }
     }
 
     override operator fun contains(element: T): Boolean {
         val closest = find(element)
-        return closest != null && element.compareTo(closest.value) == 0
+        return closest != null && match(closest.value) && element.compareTo(closest.value) == 0
     }
 
     private fun find(value: T): Node<T>? =
@@ -218,16 +232,9 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Сложная
          */
         override fun remove() {
-            println()
-            println("---")
-            println("----")
-            println(elements())
             remove(current)
             val last = last()
             if (current!! > last) current = last
-            println(elements())
-            println("----")
-            println("---")
         }
     }
 
@@ -236,69 +243,60 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
     override fun comparator(): Comparator<in T>? = null
 /*
     class SubSet<T : Comparable<T>>(
-        val tree: BinaryTree<T>,
-        val hasStart: Boolean, val start: T,
-        val hasFinish: Boolean, val finish: T
-    ) : BinaryTree<T>() {
+        private var tree: KtBinaryTree<T>,
+        private var start: T?,
+        private var finish: T?
+    ) : KtBinaryTree<T>() {
+
+        private constructor() : this() {
+            this.tree = tree
+            this.start = start
+            this.finish = finish
+        }
+
+        private class SubSetIterator<T> : Iterator<T> {
+
+            val iter = tree.iterator()
+
+            override fun next(): T {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun hasNext(): Boolean {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+
+        }
+
+        private fun match(element: T) = (start == null || start <= element) && (finish == null || finish > element)
 
         override fun contains(element: T) =
-            tree.contains(element) && (!hasStart || element >= start) && (!hasFinish || element < finish)
+            tree.contains(element) && match(element)
 
-        override fun add(element: T): Boolean =
-            if ((!hasStart || element >= start) && (!hasFinish || element < finish)) tree.add(element)
-            else throw IllegalArgumentException()
+        override fun add(element: T): Boolean = if (match(element)) tree.add(element)
+        else throw IllegalArgumentException()
 
-        internal fun size(): Int {
-            var size = 0
-            for (elem in this)
-                if (elem != null) size++
-            return size
-        }
+        // internal fun size(): Int
     }
 */
     /**
      * Найти множество всех элементов в диапазоне [fromElement, toElement)
      * Очень сложная
      */
-    override fun subSet(fromElement: T, toElement: T): SortedSet<T> {
-        val set = mutableSetOf<T>()
-        val iterator = BinaryTreeIterator()
-        while (iterator.hasNext()) {
-            val value = iterator.next()
-            if (value >= fromElement && value < toElement) set.add(value)
-            if (value >= toElement) break
-        }
-        return set.toSortedSet()
-    }
+    override fun subSet(fromElement: T, toElement: T): SortedSet<T> = KtBinaryTree(root, fromElement, toElement)
 
     /**
      * Найти множество всех элементов меньше заданного
      * Сложная
      */
-    override fun headSet(toElement: T): SortedSet<T> {
-        val set = mutableSetOf<T>()
-        val iterator = BinaryTreeIterator()
-        while (iterator.hasNext()) {
-            val value = iterator.next()
-            if (value < toElement) set.add(value)
-            else break
-        }
-        return set.toSortedSet()
-    }
+    override fun headSet(toElement: T): SortedSet<T> = KtBinaryTree(root, null, toElement)
 
     /**
      * Найти множество всех элементов больше или равных заданного
      * Сложная
      */
-    override fun tailSet(fromElement: T): SortedSet<T> {
-        val set = mutableSetOf<T>()
-        val iterator = BinaryTreeIterator()
-        while (iterator.hasNext()) {
-            val value = iterator.next()
-            if (value >= fromElement) set.add(value)
-        }
-        return set.toSortedSet()
-    }
+    override fun tailSet(fromElement: T): SortedSet<T> = KtBinaryTree(root, fromElement, null)
 
     override fun first(): T {
         var current: Node<T> = root ?: throw NoSuchElementException()
