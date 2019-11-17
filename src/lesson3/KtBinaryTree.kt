@@ -63,7 +63,71 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
      * Средняя
      */
     override fun remove(element: T): Boolean {
-        TODO()
+        if (!contains(element)) return false
+        var sum = findParent(element)
+        val node = restructure(find(element)!!)
+        if (sum.left != null && sum.left!!.value == element)
+            sum.left = node
+        else
+            sum.right = node
+        while (sum.value != root!!.value) {
+            val current = findParent(sum.value)
+            if (current.left != null && current.left!!.value == sum.value)
+                current.left = sum
+            else
+                current.right = sum
+            sum = current
+        }
+        root = sum
+        return true
+    }
+
+    private fun findReplace(node: Node<T>): Pair<T, Char> {
+        // 'n' - none - после замены последующая обработка не нужна
+        // 's' - slight - после замены нужна небольшая доработка
+        // 'f' - full - после замены нужна значительная доработка
+        if (node.left == null) return node.right!!.value to 'n'
+        var sum = node
+        while (sum.left != null)
+            sum = sum.left!!
+        return if (sum.right == null)
+            sum.value to 's'
+        else
+            sum.value to 'f'
+    }
+
+    private fun restructure(node: Node<T>): Node<T>? {
+        if (node.left == null && node.right == null) return null
+        if (node.left == null) return node.right
+        if (node.right == null) return node.left
+        val replace = findReplace(node)
+        when {
+            replace.second == 'n' -> {
+                val sum = Node(replace.first)
+                sum.left = node.left
+                sum.right = find(replace.first)!!.right
+                return sum
+            }
+            replace.second == 's' -> {
+                // Согласно случаю 's', replace.first -
+                // это - узел без наследников,
+                // так что дальше первой строки
+                // в этой функции он не продвинется.
+                remove(replace.first)
+                val sum = Node(replace.first)
+                sum.left = node.left
+                sum.right = find(replace.first)!!.right
+                return sum
+            }
+            else -> {
+                // ???
+                remove(replace.first)
+                val sum = Node(replace.first)
+                sum.left = node.left
+                sum.right = find(replace.first)!!.right
+                return sum
+            }
+        }
     }
 
     override operator fun contains(element: T): Boolean {
@@ -83,41 +147,15 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
         }
     }
 
-    // Предполагается, что в эту функцию будут попадать только существующие узлы
-    private fun whosMyParent(kid: T, node: Node<T>): Node<T> {
-        if ((node.left != null && node.left!!.value == kid) ||
-            (node.right != null && node.right!!.value == kid)
-        ) return node
-        if (node.value < kid) return whosMyParent(kid, node.right!!)
-        return whosMyParent(kid, node.left!!)
-    }
-
-    private fun nextAfter(node: Node<T>, current: T?): T {
-        if (current == null) {
-            return if (node.left == null) {
-                node.value
-            } else nextAfter(node.left!!, current)
+    private fun findParent(kid: T): Node<T> {
+        var sum = root ?: throw NoSuchElementException()
+        while (true) {
+            if ((sum.left != null && sum.left!!.value == kid) ||
+                (sum.right != null && sum.right!!.value == kid)
+            ) return sum
+            if (sum.value < kid) sum = sum.right ?: throw NoSuchElementException()
+            if (sum.value > kid) sum = sum.left ?: throw NoSuchElementException()
         }
-        if (node.left != null &&
-            node.left!!.value == current &&
-            node.left!!.right == null
-        ) return node.value
-        return when {
-            node.value == current -> if (node.right != null) nextAfter(node.right!!, current)
-            else nextAfter(whosMyParent(current, root!!), current)
-            node.value > current -> if (node.left != null && node.left!!.value > current) nextAfter(
-                node.left!!,
-                current
-            )
-            else node.value
-            else -> nextAfter(whosMyParent(node.value, root!!), current)
-        }
-    }
-
-    private fun maxElem(node: Node<T>?): T? {
-        if (node == null) return null
-        return if (node.right != null) maxElem(node.right!!)
-        else node.value
     }
 
     inner class BinaryTreeIterator internal constructor() : MutableIterator<T> {
@@ -127,17 +165,41 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Проверка наличия следующего элемента
          * Средняя
          */
-        override fun hasNext(): Boolean = (current != maxElem(root) && root != null)
+        /** Время реализации = до O(n) **/
+        /** Затраты памяти = 1 **/
+        override fun hasNext(): Boolean = current != last()
 
         /**
          * Поиск следующего элемента
          * Средняя
          */
+        /** Время реализации = до O(n) **/
+        /** Затраты памяти = 1 **/
         override fun next(): T {
-            if (current == maxElem(root) || root == null) throw IndexOutOfBoundsException()
-            current = if (current == null) nextAfter(root!!, current)
-            else nextAfter(find(current!!)!!, current)
+            if (!hasNext()) throw NoSuchElementException()
+            if (current == null) return first()
+            current = nextAfter(find(current!!)!!, current!!)
             return current!!
+        }
+
+        private fun nextAfter(node: Node<T>, current: T): T {
+            var sum = node
+            while (true)
+                when {
+                    sum.value == current -> {
+                        sum = if (sum.right != null) sum.right!!
+                        else findParent(sum.value)
+                    }
+                    sum.value > current -> {
+                        if (sum.left != null) {
+                            if (sum.left!!.value > current) sum = sum.left!!
+                            if (sum.left!!.value == current &&
+                                sum.left!!.right == null
+                            ) return sum.value
+                        } else return sum.value
+                    }
+                    else -> sum = findParent(sum.value)
+                }
         }
 
         /**
@@ -145,8 +207,9 @@ class KtBinaryTree<T : Comparable<T>> : AbstractMutableSet<T>(), CheckableSorted
          * Сложная
          */
         override fun remove() {
-            // TODO
-            throw NotImplementedError()
+            val now = current
+            remove(next())
+            current = now
         }
     }
 
