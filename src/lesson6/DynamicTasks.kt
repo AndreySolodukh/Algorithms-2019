@@ -68,6 +68,9 @@ class SubSearch {
  * то вернуть ту, в которой числа расположены раньше (приоритет имеют первые числа).
  * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
  */
+/** Время реализации = O(n^2) **/
+/** Затраты памяти = O(n) **/
+
 fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
     if (list.isEmpty()) return listOf()
     val subLength = mutableListOf<Int>()
@@ -84,6 +87,9 @@ fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
                     subLength[i] = subLength[j] + 1
                 }
     }
+    // При такой реализации в принципе не должны
+    // более подходящие под условие строки стоять позже по индексу,
+    // так что дополнительных проверок для `max` не нужно.
     var max = subLength.indexOf(subLength.max())
     val sum = mutableListOf<Int>()
     while (max != -1) {
