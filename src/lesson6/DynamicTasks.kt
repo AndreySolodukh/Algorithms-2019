@@ -2,6 +2,9 @@
 
 package lesson6
 
+import java.io.File
+import java.lang.IllegalArgumentException
+
 /**
  * Наибольшая общая подпоследовательность.
  * Средняя
@@ -14,8 +17,43 @@ package lesson6
  * Если есть несколько самых длинных общих подпоследовательностей, вернуть любую из них.
  * При сравнении подстрок, регистр символов *имеет* значение.
  */
+/** Время реализации = O(first.length * second.length) **/
+/** Затраты памяти = O(first.length * second.length) **/
+
 fun longestCommonSubSequence(first: String, second: String): String {
-    TODO()
+    val search = SubSearch()
+    return search.longestSub(first, second)
+}
+
+class SubSearch {
+
+    private val searched = mutableMapOf<Pair<String, String>, String>()
+
+    private fun maxSub(first: String, second: String): String {
+        return when {
+            first.length > second.length -> first
+            first.length < second.length -> second
+            else -> if (first > second) first else second
+        }
+    }
+
+    fun longestSub(first: String, second: String): String {
+        val long = maxSub(first, second)
+        val short = if (long == first) second else first
+        if (searched[long to short] != null) return searched[long to short]!!
+        if (short.isEmpty()) {
+            searched[long to short] = ""
+            return searched[long to short]!!
+        } else
+            if (long.first() == short.first()) {
+                searched[long to short] = first.first() + longestSub(long.drop(1), short.drop(1))
+                return searched[long to short]!!
+            } else {
+                searched[long to short] = maxSub(longestSub(long.drop(1), short), longestSub(long, short.drop(1)))
+                return searched[long to short]!!
+            }
+    }
+
 }
 
 /**
@@ -31,7 +69,28 @@ fun longestCommonSubSequence(first: String, second: String): String {
  * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
  */
 fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
-    TODO()
+    if (list.isEmpty()) return listOf()
+    val subLength = mutableListOf<Int>()
+    val ancestor = mutableListOf<Int>()
+    for (i in list.indices) {
+        subLength.add(1)
+        ancestor.add(-1)
+        for (j in 0..i)
+            if (list[j] < list[i])
+                if (subLength[i] < subLength[j] + 1 ||
+                    (subLength[i] == subLength[j] + 1 && list[ancestor[i]] < list[j])
+                ) {
+                    ancestor[i] = j
+                    subLength[i] = subLength[j] + 1
+                }
+    }
+    var max = subLength.indexOf(subLength.max())
+    val sum = mutableListOf<Int>()
+    while (max != -1) {
+        sum.add(list[max])
+        max = ancestor[max]
+    }
+    return sum.reversed()
 }
 
 /**
@@ -54,9 +113,55 @@ fun longestIncreasingSubSequence(list: List<Int>): List<Int> {
  *
  * Здесь ответ 2 + 3 + 4 + 1 + 2 = 12
  */
+/** Время реализации = O(height * width) **/
+/** Затраты памяти = O(height * width) **/
+
 fun shortestPathOnField(inputName: String): Int {
-    TODO()
+    val field = mutableMapOf<Pair<Int, Int>, Int>()
+    var height = 0
+    var width = 0
+    val file = File(inputName).bufferedReader()
+    var line = file.readLine()
+    while (line != null) {
+        val chars = line.split(' ')
+        if (width == 0) width = chars.size
+        for (i in chars.indices) {
+            try {
+                field[height to i] = chars[i].toInt()
+            } catch (e: NumberFormatException) {
+                throw IllegalArgumentException()
+            }
+        }
+        line = file.readLine()
+        height++
+    }
+
+    for (i in 0 until height) {
+        for (j in 0 until width) {
+            when {
+                i == 0 && j == 0 -> {
+                }
+                i == 0 -> field[i to j] = field[i to j]!! + field[i to j - 1]!!
+                j == 0 -> field[i to j] = field[i to j]!! + field[i - 1 to j]!!
+                else -> {
+                    val left = field[i to j - 1]!!
+                    val up = field[i - 1 to j]!!
+                    val diag = field[i - 1 to j - 1]!!
+                    when {
+                        left < up && left < diag ->
+                            field[i to j] = field[i to j]!! + field[i to j - 1]!!
+                        up < diag ->
+                            field[i to j] = field[i to j]!! + field[i - 1 to j]!!
+                        else ->
+                            field[i to j] = field[i to j]!! + field[i - 1 to j - 1]!!
+                    }
+                }
+            }
+        }
+    }
+    return field[height - 1 to width - 1]!!
 }
+
 
 // Задачу "Максимальное независимое множество вершин в графе без циклов"
 // смотрите в уроке 5
