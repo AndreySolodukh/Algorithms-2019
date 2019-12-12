@@ -157,31 +157,70 @@ fun Graph.minimumSpanningTree(): Graph {
  *
  * Эта задача может быть зачтена за пятый и шестой урок одновременно
  */
-
+/** Время реализации = O(v + e), где v и e - кол-во вершин и граней **/
+/** Затраты памяти = O(v), где v - кол-во вершин **/
 
 fun Graph.largestIndependentVertexSet(): Set<Vertex> {
+
     if (vertices.isEmpty()) return setOf()
-    val trees = mutableMapOf<Vertex, Set<Vertex>>()
-    val start = vertices.first()
-    fun buildTrees(vertex: Vertex): Set<Vertex> {
-        println(trees)
-        if (trees[vertex] != null) return trees[vertex]!!
-        trees[vertex] = setOf(vertex)
-        val childLine = mutableSetOf<Vertex>()
-        val grandLine = mutableSetOf<Vertex>()
-        val childs = getNeighbors(vertex)
-        val grandchilds = mutableSetOf<Vertex>()
-        for (child in childs) {
-            childLine += buildTrees(child)
-            for (grand in getNeighbors(child))
-                grandchilds += grand
+
+    val remaining = vertices
+    val trees = mutableSetOf<Vertex>()
+
+    fun buildTrees() {
+        val tree = remaining.first()
+        trees += tree
+        remaining.remove(tree)
+        var linked = getNeighbors(tree).filter { it in remaining }.toSet()
+        while (linked.isNotEmpty()) {
+            val newlinked = mutableSetOf<Vertex>()
+            for (elem in linked) {
+                newlinked += getNeighbors(elem).filter { it in remaining }
+                remaining.remove(elem)
+            }
+            linked = newlinked
         }
-        for (grand in grandchilds)
-            grandLine += buildTrees(vertex)
-        trees[vertex] = if (grandLine.size + 1 > childLine.size) grandLine else childLine
-        return trees[vertex]!!
     }
-    return buildTrees(start)
+    while (remaining.isNotEmpty()) {
+        buildTrees()
+    }
+
+    fun maxOf(first: Set<Vertex>, second: Set<Vertex>): Set<Vertex> {
+        when {
+            first.size > second.size -> return first
+            first.size < second.size -> return second
+            else -> for (elem in vertices) {
+                if (elem in first) return first
+                if (elem in second) return second
+            }
+        }
+        // *unreachable*
+        return first
+    }
+
+    val sets = mutableMapOf<Vertex, Set<Vertex>>()
+    fun buildSets(vertex: Vertex, previous: Set<Vertex>): Set<Vertex> {
+        if (sets[vertex] != null) return sets[vertex]!!
+        val children = mutableSetOf<Vertex>()
+        val grandchildren = mutableSetOf<Vertex>()
+        val grandlist = mutableSetOf<Vertex>()
+        for (child in getNeighbors(vertex).filter { it !in previous }) {
+            grandlist += getNeighbors(child) - vertex
+            children += buildSets(child, previous + vertex)
+        }
+        for (child in grandlist.filter { it !in previous }) {
+            grandchildren += buildSets(child, previous + vertex)
+        }
+        grandchildren.add(vertex)
+        sets[vertex] = maxOf(children, grandchildren)
+        return sets[vertex]!!
+    }
+
+    val sum = mutableSetOf<Vertex>()
+    for (tree in trees) {
+        sum += buildSets(tree, setOf(tree))
+    }
+    return sum
 }
 
 

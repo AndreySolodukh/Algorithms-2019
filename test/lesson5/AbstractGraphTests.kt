@@ -467,6 +467,73 @@ abstract class AbstractGraphTests {
             setOf(cross["A"], cross["B"], cross["C"], cross["D"]),
             cross.largestIndependentVertexSet()
         )
+
+        val customGraph1 = GraphBuilder().apply {
+            val a = addVertex("A")
+            val b = addVertex("B")
+            val c = addVertex("C")
+            val d = addVertex("D")
+            val e = addVertex("E")
+            val f = addVertex("F")
+            val g = addVertex("G")
+            val h = addVertex("H")
+            val i = addVertex("I")
+            val j = addVertex("J")
+            val k = addVertex("K")
+            val l = addVertex("L")
+            addConnection(a, b)
+            addConnection(b, c)
+            addConnection(c, d)
+            addConnection(d, h)
+            addConnection(h, g)
+            addConnection(g, f)
+            addConnection(f, e)
+            addConnection(e, a)
+            addConnection(h, l)
+            addConnection(l, k)
+            addConnection(k, g)
+            addConnection(f, j)
+            addConnection(i, e)
+        }.build()
+        assertEquals(
+            setOf(customGraph1["A"], customGraph1["C"], customGraph1["E"], customGraph1["G"],
+                customGraph1["I"], customGraph1["J"], customGraph1["L"]),
+            customGraph1.largestIndependentVertexSet()
+        )
+
+        val customGraph2 = GraphBuilder().apply {
+            val a = addVertex("A")
+            val b = addVertex("B")
+            val c = addVertex("C")
+            val d = addVertex("D")
+            val e = addVertex("E")
+            val f = addVertex("F")
+            val g = addVertex("G")
+            val h = addVertex("H")
+            val i = addVertex("I")
+            val j = addVertex("J")
+            val k = addVertex("K")
+            val l = addVertex("L")
+            addConnection(a, b)
+            addConnection(b, c)
+            addConnection(c, d)
+            addConnection(d, e)
+            addConnection(e, f)
+            addConnection(f, a)
+            addConnection(b, g)
+            addConnection(g, h)
+            addConnection(h, i)
+            addConnection(i, j)
+            addConnection(j, e)
+            addConnection(b, k)
+            addConnection(k, l)
+            addConnection(l, e)
+        }.build()
+        assertEquals(
+            setOf(customGraph2["A"], customGraph2["C"], customGraph2["E"],
+                customGraph2["G"], customGraph2["I"],customGraph2["K"]),
+            customGraph2.largestIndependentVertexSet()
+        )
     }
 
     fun longestSimplePath(longestSimplePath: Graph.() -> Path) {
