@@ -158,6 +158,7 @@ fun Graph.minimumSpanningTree(): Graph {
  * Эта задача может быть зачтена за пятый и шестой урок одновременно
  */
 
+
 fun Graph.largestIndependentVertexSet(): Set<Vertex> {
     if (vertices.isEmpty()) return setOf()
     val trees = mutableMapOf<Vertex, Set<Vertex>>()
@@ -204,6 +205,8 @@ fun Graph.largestIndependentVertexSet(): Set<Vertex> {
  *
  * Ответ: A, E, J, K, D, C, H, G, B, F, I
  */
+/** Время реализации = O(n!) **/
+/** Затраты памяти = O(n!) **/
 fun Graph.longestSimplePath(): Path {
     var sum = Path()
     val paths = ArrayDeque<Path>()
