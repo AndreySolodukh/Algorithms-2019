@@ -2,6 +2,8 @@
 
 package lesson5
 
+import lesson5.Graph.*
+
 /**
  * Эйлеров цикл.
  * Средняя
@@ -28,8 +30,44 @@ package lesson5
  * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
  * связного графа ровно по одному разу
  */
-fun Graph.findEulerLoop(): List<Graph.Edge> {
-    TODO()
+/** Время реализации = O(n) **/
+/** Затраты памяти = O(n) **/
+
+fun Graph.findEulerLoop(): List<Edge> {
+    val vertices = vertices
+    if (vertices.size == 0 || vertices.any { getNeighbors(it).size % 2 != 0 }) return listOf()
+    val path = mutableListOf<Edge>()
+    val visitedEdges = mutableSetOf<Edge>()
+    val start = vertices.first()
+    var current = start
+    while (true) {
+        val connections = getConnections(current).filter { it.value !in visitedEdges }
+        if (connections.size == 1)
+            if (visitedEdges.size == edges.size - 1) {
+                path.add(connections[start]!!)
+                break
+            } else {
+                current = connections.toList().first().first
+                path.add(connections[current]!!)
+                visitedEdges.add((connections[current]!!))
+                continue
+            }
+        var minConnections = 0
+        for (elem in connections.filter { it.key != start }) {
+            val numOfConnections = getConnections(elem.key).filter { it.value !in visitedEdges }.size
+            if (minConnections == 0) {
+                minConnections = numOfConnections
+                current = elem.key
+            } else
+                if (minConnections > numOfConnections) {
+                    minConnections = numOfConnections
+                    current = elem.key
+                }
+        }
+        path.add(connections[current]!!)
+        visitedEdges.add((connections[current]!!))
+    }
+    return path
 }
 
 /**
@@ -90,7 +128,7 @@ fun Graph.minimumSpanningTree(): Graph {
  *
  * Эта задача может быть зачтена за пятый и шестой урок одновременно
  */
-fun Graph.largestIndependentVertexSet(): Set<Graph.Vertex> {
+fun Graph.largestIndependentVertexSet(): Set<Vertex> {
     TODO()
 }
 

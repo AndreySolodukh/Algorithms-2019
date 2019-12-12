@@ -71,6 +71,17 @@ abstract class AbstractGraphTests {
             val i = addVertex("I")
             val j = addVertex("J")
             val k = addVertex("K")
+            //
+            //       g -- h
+            //       |    |
+            //  a -- b -- c -- d
+            //  |    |    |    |
+            //  e    f -- i    |
+            //  |              |
+            //  j ------------ k
+            //
+            // ab bc cd
+            //
             addConnection(a, b)
             addConnection(b, c)
             addConnection(c, d)
