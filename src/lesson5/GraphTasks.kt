@@ -3,6 +3,8 @@
 package lesson5
 
 import lesson5.Graph.*
+import lesson5.impl.GraphBuilder
+import java.util.*
 
 /**
  * Эйлеров цикл.
@@ -34,8 +36,7 @@ import lesson5.Graph.*
 /** Затраты памяти = O(n) **/
 
 fun Graph.findEulerLoop(): List<Edge> {
-    val vertices = vertices
-    if (vertices.size == 0 || vertices.any { getNeighbors(it).size % 2 != 0 }) return listOf()
+    if (vertices.isEmpty() || vertices.any { getNeighbors(it).size % 2 != 0 }) return listOf()
     val path = mutableListOf<Edge>()
     val visitedEdges = mutableSetOf<Edge>()
     val start = vertices.first()
@@ -98,8 +99,36 @@ fun Graph.findEulerLoop(): List<Edge> {
  * |
  * J ------------ K
  */
+/** Время реализации = O(n) **/
+/** Затраты памяти = O(n) **/
+
 fun Graph.minimumSpanningTree(): Graph {
-    TODO()
+    if (vertices.isEmpty()) return GraphBuilder().build()
+    val usedEdges = mutableListOf<Edge>()
+    val usedVertices = mutableSetOf<Vertex>()
+
+    fun buildTree(new: Vertex) {
+        for ((vertex, edge) in getConnections(new))
+            if (vertex !in usedVertices) {
+                usedEdges.add(edge)
+                usedVertices.add(vertex)
+                buildTree(vertex)
+            }
+    }
+
+    buildTree(vertices.first())
+    val builder = GraphBuilder()
+    builder.apply {
+        for (i in usedEdges.indices) {
+            if (i == 0) {
+                addVertex(usedEdges[i].begin)
+                addVertex(usedEdges[i].end)
+            } else
+                addVertex(usedEdges[i].end)
+            addConnection(usedEdges[i].begin, usedEdges[i].end)
+        }
+    }
+    return builder.build()
 }
 
 /**
@@ -128,9 +157,32 @@ fun Graph.minimumSpanningTree(): Graph {
  *
  * Эта задача может быть зачтена за пятый и шестой урок одновременно
  */
+
 fun Graph.largestIndependentVertexSet(): Set<Vertex> {
-    TODO()
+    if (vertices.isEmpty()) return setOf()
+    val trees = mutableMapOf<Vertex, Set<Vertex>>()
+    val start = vertices.first()
+    fun buildTrees(vertex: Vertex): Set<Vertex> {
+        println(trees)
+        if (trees[vertex] != null) return trees[vertex]!!
+        trees[vertex] = setOf(vertex)
+        val childLine = mutableSetOf<Vertex>()
+        val grandLine = mutableSetOf<Vertex>()
+        val childs = getNeighbors(vertex)
+        val grandchilds = mutableSetOf<Vertex>()
+        for (child in childs) {
+            childLine += buildTrees(child)
+            for (grand in getNeighbors(child))
+                grandchilds += grand
+        }
+        for (grand in grandchilds)
+            grandLine += buildTrees(vertex)
+        trees[vertex] = if (grandLine.size + 1 > childLine.size) grandLine else childLine
+        return trees[vertex]!!
+    }
+    return buildTrees(start)
 }
+
 
 /**
  * Наидлиннейший простой путь.
@@ -153,5 +205,16 @@ fun Graph.largestIndependentVertexSet(): Set<Vertex> {
  * Ответ: A, E, J, K, D, C, H, G, B, F, I
  */
 fun Graph.longestSimplePath(): Path {
-    TODO()
+    var sum = Path()
+    val paths = ArrayDeque<Path>()
+    for (elem in vertices)
+        paths.add(Path(elem))
+    while (paths.isNotEmpty()) {
+        val path = paths.poll()
+        if (path.length > sum.length)
+            sum = path
+        for (elem in getNeighbors(path.vertices.last()))
+            if (elem !in path) paths.add(Path(path, this, elem))
+    }
+    return sum
 }
