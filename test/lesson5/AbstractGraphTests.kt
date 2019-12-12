@@ -534,6 +534,23 @@ abstract class AbstractGraphTests {
                 customGraph2["G"], customGraph2["I"],customGraph2["K"]),
             customGraph2.largestIndependentVertexSet()
         )
+
+        val customGraph3 = GraphBuilder().apply {
+            val a = addVertex("A")
+            val b = addVertex("B")
+            val c = addVertex("C")
+            val d = addVertex("D")
+            val e = addVertex("E")
+            val f = addVertex("F")
+            val g = addVertex("G")
+            val h = addVertex("H")
+            val i = addVertex("I")
+        }.build()
+        assertEquals(
+            setOf(customGraph3["A"], customGraph3["B"], customGraph3["C"], customGraph3["D"],
+                customGraph3["E"], customGraph3["F"], customGraph3["G"], customGraph3["H"], customGraph3["I"]),
+            customGraph3.largestIndependentVertexSet()
+        )
     }
 
     fun longestSimplePath(longestSimplePath: Graph.() -> Path) {
