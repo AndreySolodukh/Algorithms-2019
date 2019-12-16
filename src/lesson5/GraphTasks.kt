@@ -32,7 +32,7 @@ import java.util.*
  * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
  * связного графа ровно по одному разу
  */
-/** Время реализации = O(n) **/
+/** Время реализации = O(n), где n - количество граней **/
 /** Затраты памяти = O(n) **/
 
 fun Graph.findEulerLoop(): List<Edge> {
@@ -48,7 +48,7 @@ fun Graph.findEulerLoop(): List<Edge> {
                 path.add(connections[start]!!)
                 break
             } else {
-                current = connections.toList().first().first
+                current = connections.keys.first()
                 path.add(connections[current]!!)
                 visitedEdges.add((connections[current]!!))
                 continue
@@ -99,7 +99,7 @@ fun Graph.findEulerLoop(): List<Edge> {
  * |
  * J ------------ K
  */
-/** Время реализации = O(n) **/
+/** Время реализации = O(n), где n - количество вершин **/
 /** Затраты памяти = O(n) **/
 
 fun Graph.minimumSpanningTree(): Graph {
